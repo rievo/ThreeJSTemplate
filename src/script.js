@@ -3,117 +3,123 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 
-// Canvas
-const canvas = document.querySelector('canvas.webgl')
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
+
+export default class Sketch {
+    constructor(options) {
+        // Canvas
+        this.canvas = document.querySelector('canvas.webgl')
+        this.sizes = {
+            width: window.innerWidth,
+            height: window.innerHeight
+        }
+        this.clock = new THREE.Clock()
+
+        this.scene = undefined;
+        this.controls = undefined;
+        this.renderer = undefined;
+        this.camera = undefined
+        this.sphere = undefined;
+
+    }
+
+    prepareScene = () => {
+        this.scene = new THREE.Scene()
+
+        this.camera = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 100)
+        this.camera.position.x = 0
+        this.camera.position.y = 0
+        this.camera.position.z = 2
+        this.scene.add(this.camera)
+
+        this.controls = new OrbitControls(this.camera, this.canvas)
+    }
+
+    prepareWindow = () => {
+        window.addEventListener('resize', () => {
+            // Update sizes
+            this.sizes.width = window.innerWidth
+            this.sizes.height = window.innerHeight
+
+            // Update camera
+            this.camera.aspect = this.sizes.width / this.sizes.height
+            this.camera.updateProjectionMatrix()
+
+            // Update renderer
+            this.renderer.setSize(this.sizes.width, this.sizes.height)
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+        })
+
+        this.renderer = new THREE.WebGLRenderer({
+            canvas: this.canvas
+        })
+        this.renderer.setClearColor(0xcedbf0);
+        this.renderer.setSize(this.sizes.width, this.sizes.height)
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+    }
+
+    addElementsToScene = () => {
+
+        // Objects
+        const geometry = new THREE.TorusGeometry(.7, .2, 16, 100);
+
+        // Materials
+
+        const material = new THREE.MeshLambertMaterial({
+            color: 0x00afaf,
+            emissive: 0x7a7a7a,
+            emissiveIntensity: 0.5,
+            side: THREE.DoubleSide
+        })
+
+        // Mesh
+        this.sphere = new THREE.Mesh(geometry, material)
+        this.scene.add(this.sphere)
+
+    }
+
+    addLights = () => {
+        const pointLight = new THREE.PointLight(0xffffff, 0.1)
+        pointLight.position.x = 2
+        pointLight.position.y = 3
+        pointLight.position.z = 4
+        this.scene.add(pointLight)
+
+    }
+
+
+    myAnimations = (elapsedTime) => {
+        this.sphere.rotation.z = .9 * elapsedTime
+        this.sphere.rotation.y = .9 * elapsedTime
+        this.sphere.rotation.x = .9 * elapsedTime
+    }
+
+    animate = () => {
+
+        const elapsedTime = this.clock.getElapsedTime()
+        // Update Orbital Controls
+        this.controls.update()
+
+        this.myAnimations(elapsedTime)
+        // Render
+        this.renderer.render(this.scene, this.camera)
+
+        // Call tick again on the next frame
+        window.requestAnimationFrame(this.animate)
+    }
+
+
+    startEverything = () => {
+        this.prepareWindow()
+        this.prepareScene()
+        this.addElementsToScene()
+        this.addLights()
+
+        this.animate()
+    }
 }
-const clock = new THREE.Clock()
 
 
-
-let scene = undefined;
-let controls = undefined;
-let renderer = undefined;
-let camera = undefined
-let sphere = undefined;
-
-function prepareScene() {
-    scene = new THREE.Scene()
-
-    camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-    camera.position.x = 0
-    camera.position.y = 0
-    camera.position.z = 2
-    scene.add(camera)
-
-    controls = new OrbitControls(camera, canvas)
-}
-
-function prepareWindow() {
-    window.addEventListener('resize', () => {
-        // Update sizes
-        sizes.width = window.innerWidth
-        sizes.height = window.innerHeight
-
-        // Update camera
-        camera.aspect = sizes.width / sizes.height
-        camera.updateProjectionMatrix()
-
-        // Update renderer
-        renderer.setSize(sizes.width, sizes.height)
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
-    })
-
-    renderer = new THREE.WebGLRenderer({
-        canvas: canvas
-    })
-    renderer.setClearColor(0xcedbf0);
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
-}
-
-function addElementsToScene() {
-
-    // Objects
-    const geometry = new THREE.TorusGeometry(.7, .2, 16, 100);
-
-    // Materials
-
-    const material = new THREE.MeshLambertMaterial({
-        color: 0x00afaf,
-        emissive: 0x7a7a7a,
-        emissiveIntensity: 0.5,
-        side: THREE.DoubleSide
-    })
-
-    // Mesh
-    sphere = new THREE.Mesh(geometry, material)
-    scene.add(sphere)
-
-}
-
-function addLights() {
-    const pointLight = new THREE.PointLight(0xffffff, 0.1)
-    pointLight.position.x = 2
-    pointLight.position.y = 3
-    pointLight.position.z = 4
-    scene.add(pointLight)
-
-}
-
-
-const myAnimations = (elapsedTime) => {
-    sphere.rotation.z = .9 * elapsedTime
-    sphere.rotation.y = .9 * elapsedTime
-    sphere.rotation.x = .9 * elapsedTime
-}
-
-const animate = () => {
-
-    const elapsedTime = clock.getElapsedTime()
-    // Update Orbital Controls
-    controls.update()
-
-    myAnimations(elapsedTime)
-    // Render
-    renderer.render(scene, camera)
-
-    // Call tick again on the next frame
-    window.requestAnimationFrame(animate)
-}
-
-
-function startEverything() {
-    prepareWindow()
-    prepareScene()
-    addElementsToScene()
-    addLights()
-
-    animate()
-}
-
-startEverything()
+const mySketch = new Sketch()
+mySketch.startEverything()
