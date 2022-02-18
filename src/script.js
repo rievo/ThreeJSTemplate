@@ -28,8 +28,8 @@ export default class Sketch {
 
         this.camera = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 100)
         this.camera.position.x = 0
-        this.camera.position.y = 0
-        this.camera.position.z = 2
+        this.camera.position.y = 2
+        this.camera.position.z = 3
         this.scene.add(this.camera)
 
         this.controls = new OrbitControls(this.camera, this.canvas)
@@ -68,7 +68,7 @@ export default class Sketch {
     addElementsToScene = () => {
 
         // Objects
-        const geometry = new THREE.TorusGeometry(.7, .2, 16, 100);
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
 
         // Materials
 
@@ -80,10 +80,10 @@ export default class Sketch {
         })
 
         // Mesh
-        const sphere = new THREE.Mesh(geometry, material)
-        this.scene.add(sphere)
+        const cube = new THREE.Mesh(geometry, material)
+        this.scene.add(cube)
 
-        this.objectsInScene["sphere"] = sphere
+        this.objectsInScene["cube"] = cube
 
     }
 
@@ -98,7 +98,7 @@ export default class Sketch {
 
     myAnimations = (elapsedTime) => {
         //this.objectsInScene["sphere"].rotation.x = .9 * elapsedTime
-        this.objectsInScene["sphere"].rotation.y = .9 * elapsedTime
+        this.objectsInScene["cube"].rotation.y = .9 * elapsedTime
         //this.objectsInScene["sphere"].rotation.z = .9 * elapsedTime
     }
 
