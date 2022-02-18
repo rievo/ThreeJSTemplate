@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 
 export default class Sketch {
-    constructor(options) {
+    constructor(options = {}) {
         // Canvas
         this.canvas = document.querySelector('canvas.webgl')
         this.sizes = {
@@ -18,8 +18,9 @@ export default class Sketch {
         this.controls = undefined;
         this.renderer = undefined;
         this.camera = undefined
-        this.sphere = undefined;
+        this.options = options;
 
+        this.objectsInScene = {};
     }
 
     prepareScene = () => {
@@ -32,6 +33,11 @@ export default class Sketch {
         this.scene.add(this.camera)
 
         this.controls = new OrbitControls(this.camera, this.canvas)
+
+        if (this.options.showAxis) {
+            const axesHelper = new THREE.AxesHelper(1);
+            this.scene.add(axesHelper);
+        }
     }
 
     prepareWindow = () => {
@@ -74,8 +80,10 @@ export default class Sketch {
         })
 
         // Mesh
-        this.sphere = new THREE.Mesh(geometry, material)
-        this.scene.add(this.sphere)
+        const sphere = new THREE.Mesh(geometry, material)
+        this.scene.add(sphere)
+
+        this.objectsInScene["sphere"] = sphere
 
     }
 
@@ -85,14 +93,13 @@ export default class Sketch {
         pointLight.position.y = 3
         pointLight.position.z = 4
         this.scene.add(pointLight)
-
     }
 
 
     myAnimations = (elapsedTime) => {
-        this.sphere.rotation.z = .9 * elapsedTime
-        this.sphere.rotation.y = .9 * elapsedTime
-        this.sphere.rotation.x = .9 * elapsedTime
+        //this.objectsInScene["sphere"].rotation.x = .9 * elapsedTime
+        this.objectsInScene["sphere"].rotation.y = .9 * elapsedTime
+        //this.objectsInScene["sphere"].rotation.z = .9 * elapsedTime
     }
 
     animate = () => {
@@ -121,5 +128,5 @@ export default class Sketch {
 }
 
 
-const mySketch = new Sketch()
+const mySketch = new Sketch({ showAxis: true })
 mySketch.startEverything()
