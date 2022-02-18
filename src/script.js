@@ -2,7 +2,8 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
-
+import vertexShader from './shaders/vertexShader.vert';
+import fragmentShader from './shaders/fragmentShader.frag';
 
 export default class Sketch {
     constructor(options = {}) {
@@ -68,19 +69,32 @@ export default class Sketch {
     addElementsToScene = () => {
 
         // Objects
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-
+        //const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const geometry = new THREE.PlaneGeometry(1, 1, 10, 10)
         // Materials
-
+        /*
         const material = new THREE.MeshLambertMaterial({
             color: 0x00afaf,
             emissive: 0x7a7a7a,
             emissiveIntensity: 0.5,
             side: THREE.DoubleSide
-        })
+        })*/
+
+        const uniforms = {
+            time: { value: 0 },
+            resolution: { value: new THREE.Vector4() },
+            vertexSize: { value: 100 }
+        }
+
+        const material = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader
+        });
 
         // Mesh
-        const cube = new THREE.Mesh(geometry, material)
+        //const cube = new THREE.Mesh(geometry, material)
+        const cube = new THREE.Points(geometry, material)
         this.scene.add(cube)
 
         this.objectsInScene["cube"] = cube
@@ -98,7 +112,7 @@ export default class Sketch {
 
     myAnimations = (elapsedTime) => {
         //this.objectsInScene["sphere"].rotation.x = .9 * elapsedTime
-        this.objectsInScene["cube"].rotation.y = .9 * elapsedTime
+        //this.objectsInScene["cube"].rotation.y = .9 * elapsedTime
         //this.objectsInScene["sphere"].rotation.z = .9 * elapsedTime
     }
 
